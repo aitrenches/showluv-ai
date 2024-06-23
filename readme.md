@@ -1,4 +1,4 @@
-# Django Project Deployment on AWS LightSail Containers via GitHub Actions
+# Django Project Deployment on AWS LightSail Containers via GitHub Actions.
 ## Why: 
 Setting up django for production is hard! Using this template will give you a easy deployment that comes out of the box with: 
 - 🐳 Container service (Easily scale both horizontally and vertically in AWS lightsail)
