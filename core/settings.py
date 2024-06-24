@@ -32,7 +32,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ['djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com', 'localhost', '0.0.0.0', '127.0.0.1',]
-CSRF_TRUSTED_ORIGINS = ['https://localhost','djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com','https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost','https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com','https://127.0.0.1']
 
 # Application definition
 
