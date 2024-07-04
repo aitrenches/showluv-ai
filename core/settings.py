@@ -167,7 +167,7 @@ else:
     # Production settings (using S3)
     # s3 static settings
     STATIC_LOCATION = 'static'
-    STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{STATIC_LOCATION}/'
+    STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{STATIC_LOCATION}/'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Common settings for both environments
