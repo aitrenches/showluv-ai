@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trenches AI</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <div class="container">
+        <!-- <div class="logo">
+            <img src="{% static 'images/trenches.png' %}" alt="Trenches AI Logo">
+        </div> -->
+        <h1>Welcome to Trenches AI</h1>
+        <div class="buttons">
+            <a href="{% url 'login' %}" class="button">Log In</a>
+            <a href="{% url 'signup' %}" class="button">Sign Up</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -98,6 +98,12 @@ jobs:
           run: |
             sudo pip3 install --upgrade pip
             sudo pip3 install -r requirements.txt
+        - name: Collect static files
+          run: |
+            python3 manage.py collectstatic --noinput
+        - name: Sync static files to S3
+          run: |
+            aws s3 sync staticfiles/ s3://${{ secrets.S3_AWS_STORAGE_BUCKET_NAME }}/static/ --delete
         - name: 🐳 Create a Docker Container for DJANGO
           run: docker build -t django:latest .
         - name: 📬 Upload Backend image to AWS container register
