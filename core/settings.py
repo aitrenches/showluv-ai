@@ -188,15 +188,13 @@ if DEBUG:
 else:
     # Production settings (using S3)
     STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        },
         "staticfiles": {
-            "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
     STATIC_LOCATION = 'static'
     STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{STATIC_LOCATION}/'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 ########################################
 
