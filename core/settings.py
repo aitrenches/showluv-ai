@@ -201,6 +201,8 @@ else:
     # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
     # Production settings (using S3 and WhiteNoise)
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ########################################
@@ -229,5 +231,7 @@ SWAGGER_SETTINGS = {
             'in': 'header',
             'name': 'X-API-Key'
         }
-    }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
 }
