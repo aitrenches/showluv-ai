@@ -32,7 +32,7 @@ API_KEY = env("API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = env("DEBUG")
 # DEBUG = env.bool("DEBUG", default=False)
-DEBUG = true
+DEBUG = True
 
 ALLOWED_HOSTS = ['djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com', 'localhost', '0.0.0.0', '127.0.0.1',]
 CSRF_TRUSTED_ORIGINS = ['https://localhost','https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com','https://127.0.0.1']
