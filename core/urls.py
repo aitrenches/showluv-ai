@@ -18,8 +18,31 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views
 
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Trenches AI Staff productivity APIs",
+      default_version='v1',
+      description="YouTube URL to Twitter Thread Generator API",
+    #   description="API for generating Twitter threads from YouTube video urls",
+    #   terms_of_service="https://www.yourapp.com/terms/",
+      terms_of_service="TERMS OF SERVICE ON REQUEST",
+      contact=openapi.Contact(email="anthonyoliko@gmail.com"),
+      license=openapi.License(name="MIT LICENSE"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('', views.home, name='home'),  # Add this line for the home page
+    path('', views.home, name='home'),
+    path('api/', include('youtube_to_twitter.urls')),
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

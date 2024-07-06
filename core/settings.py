@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'accounts',
+    'rest_framework',
+    'youtube_to_twitter',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -203,3 +206,26 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+
+API_KEY = env('API_KEY')
+
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    }
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Api-Key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'X-API-Key'
+        }
+    }
+}
