@@ -97,7 +97,7 @@ jobs:
         - name: Installing dependancies
           run: |
             sudo pip3 install --upgrade pip
-            sudo pip3 install -r requirements.txt
+            sudo pip3 install --ignore-installed -r requirements.txt
         - name: Collect static files
           run: |
             python3 manage.py collectstatic --noinput
