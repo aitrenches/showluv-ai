@@ -90,7 +90,7 @@ jobs:
             envkey_S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
             envkey_S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
             envkey_S3_AWS_STORAGE_BUCKET_NAME: ${{ secrets.S3_AWS_STORAGE_BUCKET_NAME }}
-            envkey_DEBUG: true
+            envkey_DEBUG: false
             envkey_API_KEY: ${{ secrets.API_KEY }}
             directory: core
             file_name: .env
