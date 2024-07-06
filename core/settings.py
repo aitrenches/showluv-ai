@@ -35,6 +35,10 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = ['djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com', 'localhost', '0.0.0.0', '127.0.0.1',]
 CSRF_TRUSTED_ORIGINS = ['https://localhost','https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com','https://127.0.0.1']
+CORS_ALLOWED_ORIGINS = ['https://localhost',
+'http://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
+'https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
+'https://127.0.0.1',]
 
 # Application definition
 
@@ -50,11 +54,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'youtube_to_twitter',
     'drf_yasg',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
