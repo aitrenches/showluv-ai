@@ -22,40 +22,40 @@ class YouTubeToTwitterView(APIView):
     authentication_classes = [APIKeyAuthentication]
     permission_classes = [IsAuthenticated]
     throttle_classes = [UserRateThrottle]
-    serializer_class = YouTubeToTwitterInputSerializer
+    # serializer_class = YouTubeToTwitterInputSerializer
 
-    # @swagger_auto_schema(
-    #     request_body=openapi.Schema(
-    #         type=openapi.TYPE_OBJECT,
-    #         required=['youtube_url'],
-    #         properties={
-    #             'youtube_url': openapi.Schema(type=openapi.TYPE_STRING, description='YouTube video URL')
-    #         },
-    #     ),
-    #     responses={
-    #         200: openapi.Response(
-    #             description="Successful response",
-    #             schema=openapi.Schema(
-    #                 type=openapi.TYPE_OBJECT,
-    #                 properties={
-    #                     'video_id': openapi.Schema(type=openapi.TYPE_STRING),
-    #                     'video_length': openapi.Schema(type=openapi.TYPE_STRING),
-    #                     'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-    #                     'twitter_thread': openapi.Schema(type=openapi.TYPE_STRING, description='Generated Twitter thread')
-    #                 },
-    #             )
-    #         ),
-    #         400: 'Bad Request',
-    #         500: 'Internal Server Error'
-    #     }
-    # )
-
-    @extend_schema(
-        request=YouTubeToTwitterInputSerializer,
-        responses={200: YouTubeToTwitterOutputSerializer},
-        description='Generate a Twitter thread from a YouTube video',
-        tags=['YouTube to Twitter'],
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['youtube_url'],
+            properties={
+                'youtube_url': openapi.Schema(type=openapi.TYPE_STRING, description='YouTube video URL')
+            },
+        ),
+        responses={
+            200: openapi.Response(
+                description="Successful response",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'video_id': openapi.Schema(type=openapi.TYPE_STRING),
+                        'video_length': openapi.Schema(type=openapi.TYPE_STRING),
+                        'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                        'twitter_thread': openapi.Schema(type=openapi.TYPE_STRING, description='Generated Twitter thread')
+                    },
+                )
+            ),
+            400: 'Bad Request',
+            500: 'Internal Server Error'
+        }
     )
+
+    # @extend_schema(
+    #     request=YouTubeToTwitterInputSerializer,
+    #     responses={200: YouTubeToTwitterOutputSerializer},
+    #     description='Generate a Twitter thread from a YouTube video',
+    #     tags=['YouTube to Twitter'],
+    # )
     
     def post(self, request):
         youtube_url = request.data.get('youtube_url')
