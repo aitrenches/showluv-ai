@@ -255,4 +255,7 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': r'/api/',
     'AUTHENTICATION_WHITELIST': ['youtube_to_twitter.authentication.APIKeyAuthentication'],
+    'AUTHENTICATION_EXTENSIONS': [
+        'youtube_to_twitter.authentication_schema.APIKeyAuthenticationScheme',
+    ],
 }
