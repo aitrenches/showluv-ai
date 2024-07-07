@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from . import views
 
 from rest_framework import permissions
@@ -44,7 +44,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', views.home, name='home'),
     path('api/', include('youtube_to_twitter.urls')),
-    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
