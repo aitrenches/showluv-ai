@@ -54,10 +54,10 @@ INSTALLED_APPS = [
     'storages',
     'accounts',
     'rest_framework',
+    'drf_spectacular',
     'youtube_to_twitter',
     'drf_yasg',
     'corsheaders',
-    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -251,4 +251,8 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Your API',
     'DESCRIPTION': 'Your project description',
     'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'AUTHENTICATION_WHITELIST': ['youtube_to_twitter.authentication.APIKeyAuthentication'],
 }

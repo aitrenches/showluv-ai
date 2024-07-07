@@ -13,36 +13,48 @@ from rest_framework.throttling import UserRateThrottle
 from .authentication import APIKeyAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from .serializers import YouTubeToTwitterInputSerializer, YouTubeToTwitterOutputSerializer
 
 class YouTubeToTwitterView(APIView):
     authentication_classes = [APIKeyAuthentication]
     permission_classes = [IsAuthenticated]
     throttle_classes = [UserRateThrottle]
+    serializer_class = YouTubeToTwitterInputSerializer
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['youtube_url'],
-            properties={
-                'youtube_url': openapi.Schema(type=openapi.TYPE_STRING, description='YouTube video URL')
-            },
-        ),
-        responses={
-            200: openapi.Response(
-                description="Successful response",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'video_id': openapi.Schema(type=openapi.TYPE_STRING),
-                        'video_length': openapi.Schema(type=openapi.TYPE_STRING),
-                        'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                        'twitter_thread': openapi.Schema(type=openapi.TYPE_STRING, description='Generated Twitter thread')
-                    },
-                )
-            ),
-            400: 'Bad Request',
-            500: 'Internal Server Error'
-        }
+    # @swagger_auto_schema(
+    #     request_body=openapi.Schema(
+    #         type=openapi.TYPE_OBJECT,
+    #         required=['youtube_url'],
+    #         properties={
+    #             'youtube_url': openapi.Schema(type=openapi.TYPE_STRING, description='YouTube video URL')
+    #         },
+    #     ),
+    #     responses={
+    #         200: openapi.Response(
+    #             description="Successful response",
+    #             schema=openapi.Schema(
+    #                 type=openapi.TYPE_OBJECT,
+    #                 properties={
+    #                     'video_id': openapi.Schema(type=openapi.TYPE_STRING),
+    #                     'video_length': openapi.Schema(type=openapi.TYPE_STRING),
+    #                     'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+    #                     'twitter_thread': openapi.Schema(type=openapi.TYPE_STRING, description='Generated Twitter thread')
+    #                 },
+    #             )
+    #         ),
+    #         400: 'Bad Request',
+    #         500: 'Internal Server Error'
+    #     }
+    # )
+
+    @extend_schema(
+        request=YouTubeToTwitterInputSerializer,
+        responses={200: YouTubeToTwitterOutputSerializer},
+        description='Generate a Twitter thread from a YouTube video',
+        tags=['YouTube to Twitter'],
     )
     
     def post(self, request):
@@ -115,66 +127,66 @@ class YouTubeToTwitterView(APIView):
         except Exception as e:
             raise Exception(f"OpenAI API error: {str(e)}")
 
-class VideoInfoView(APIView):
-    authentication_classes = [APIKeyAuthentication]
-    permission_classes = [IsAuthenticated]
+# class VideoInfoView(APIView):
+#     authentication_classes = [APIKeyAuthentication]
+#     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter('youtube_url', openapi.IN_QUERY, description="YouTube video URL", type=openapi.TYPE_STRING, required=True),
-        ],
-        responses={
-            200: openapi.Response(
-                description="Successful response",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'video_id': openapi.Schema(type=openapi.TYPE_STRING),
-                        'length': openapi.Schema(type=openapi.TYPE_STRING),
-                        'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                    },
-                )
-            ),
-            400: 'Bad Request'
-        }
-    )
-    def get(self, request):
-        youtube_url = request.query_params.get('youtube_url')
-        if not youtube_url:
-            raise ValidationError({'youtube_url': 'YouTube URL is required'})
+#     @swagger_auto_schema(
+#         manual_parameters=[
+#             openapi.Parameter('youtube_url', openapi.IN_QUERY, description="YouTube video URL", type=openapi.TYPE_STRING, required=True),
+#         ],
+#         responses={
+#             200: openapi.Response(
+#                 description="Successful response",
+#                 schema=openapi.Schema(
+#                     type=openapi.TYPE_OBJECT,
+#                     properties={
+#                         'video_id': openapi.Schema(type=openapi.TYPE_STRING),
+#                         'length': openapi.Schema(type=openapi.TYPE_STRING),
+#                         'transcript_available': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+#                     },
+#                 )
+#             ),
+#             400: 'Bad Request'
+#         }
+#     )
+#     def get(self, request):
+#         youtube_url = request.query_params.get('youtube_url')
+#         if not youtube_url:
+#             raise ValidationError({'youtube_url': 'YouTube URL is required'})
 
-        video_id = self.extract_video_id(youtube_url)
-        if not video_id:
-            raise ValidationError({'video_id': 'Invalid YouTube URL'})
+#         video_id = self.extract_video_id(youtube_url)
+#         if not video_id:
+#             raise ValidationError({'video_id': 'Invalid YouTube URL'})
 
-        try:
-            transcript = YouTubeTranscriptApi.get_transcript(video_id)
-            video_length = sum([float(entry['duration']) for entry in transcript])
+#         try:
+#             transcript = YouTubeTranscriptApi.get_transcript(video_id)
+#             video_length = sum([float(entry['duration']) for entry in transcript])
             
-            # Convert video_length to hours and minutes
-            hours = int(video_length // 3600)
-            minutes = int((video_length % 3600) // 60)
-            formatted_length = f"{hours} hour(s) {minutes} minutes"
+#             # Convert video_length to hours and minutes
+#             hours = int(video_length // 3600)
+#             minutes = int((video_length % 3600) // 60)
+#             formatted_length = f"{hours} hour(s) {minutes} minutes"
             
-            return Response({
-                'video_id': video_id,
-                'length': formatted_length,
-                'transcript_available': True
-            })
-        except Exception as e:
-            return Response({
-                'video_id': video_id,
-                'error': str(e),
-                'transcript_available': False
-            }, status=status.HTTP_400_BAD_REQUEST)
+#             return Response({
+#                 'video_id': video_id,
+#                 'length': formatted_length,
+#                 'transcript_available': True
+#             })
+#         except Exception as e:
+#             return Response({
+#                 'video_id': video_id,
+#                 'error': str(e),
+#                 'transcript_available': False
+#             }, status=status.HTTP_400_BAD_REQUEST)
         
-    def extract_video_id(self, url):
-        video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
-        if video_id_match:
-            return video_id_match.group(1)
-        return None
+#     def extract_video_id(self, url):
+#         video_id_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+#         if video_id_match:
+#             return video_id_match.group(1)
+#         return None
         
-class CustomThreadView(APIView):
+# class CustomThreadView(APIView):
     authentication_classes = [APIKeyAuthentication]
     permission_classes = [IsAuthenticated]
 
