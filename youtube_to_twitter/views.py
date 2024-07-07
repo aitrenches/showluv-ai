@@ -13,16 +13,11 @@ from rest_framework.throttling import UserRateThrottle
 from .authentication import APIKeyAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-from .serializers import YouTubeToTwitterInputSerializer, YouTubeToTwitterOutputSerializer
 
 class YouTubeToTwitterView(APIView):
     authentication_classes = [APIKeyAuthentication]
     permission_classes = [IsAuthenticated]
     throttle_classes = [UserRateThrottle]
-    # serializer_class = YouTubeToTwitterInputSerializer
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -49,13 +44,6 @@ class YouTubeToTwitterView(APIView):
             500: 'Internal Server Error'
         }
     )
-
-    # @extend_schema(
-    #     request=YouTubeToTwitterInputSerializer,
-    #     responses={200: YouTubeToTwitterOutputSerializer},
-    #     description='Generate a Twitter thread from a YouTube video',
-    #     tags=['YouTube to Twitter'],
-    # )
     
     def post(self, request):
         youtube_url = request.data.get('youtube_url')

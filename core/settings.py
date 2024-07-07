@@ -246,16 +246,3 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
     'JSON_EDITOR': True,
 }
-
-# SPECTACULAR_SETTINGS = {
-#     'TITLE': 'Your API',
-#     'DESCRIPTION': 'Your project description',
-#     'VERSION': '1.0.0',
-#     'SERVE_INCLUDE_SCHEMA': False,
-#     'COMPONENT_SPLIT_REQUEST': True,
-#     'SCHEMA_PATH_PREFIX': r'/api/',
-#     'AUTHENTICATION_WHITELIST': ['youtube_to_twitter.authentication.APIKeyAuthentication'],
-#     'AUTHENTICATION_EXTENSIONS': [
-#         'youtube_to_twitter.authentication_schema.APIKeyAuthenticationScheme',
-#     ],
-# }
