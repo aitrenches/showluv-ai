@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import YouTubeToTwitterView
+from .views import YouTubeToTwitterView, VideoInfoView, CustomThreadView
 
 urlpatterns = [
     path('generate-thread/', YouTubeToTwitterView.as_view(), name='generate_thread'),
