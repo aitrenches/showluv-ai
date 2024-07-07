@@ -233,6 +233,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
+    'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'SECURITY_DEFINITIONS': {
         'Api-Key': {
             'type': 'apiKey',
