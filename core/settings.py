@@ -16,7 +16,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-import environ
+import environ, getpass
 
 env = environ.Env()
 environ.Env.read_env()
@@ -38,7 +38,7 @@ CSRF_TRUSTED_ORIGINS = ['https://localhost','https://djangoapp.vveeq17939eno.us-
 CORS_ALLOWED_ORIGINS = ['https://localhost',
 'http://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
 'https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
-'https://127.0.0.1',]
+'https://127.0.0.1', 'http://localhost:3000']
 
 # CORS_ALLOW_ALL_ORIGINS = True
 
@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'storages',
     'accounts',
     'rest_framework',
-    # 'drf_spectacular',
     'youtube_to_twitter',
     'drf_yasg',
     'corsheaders',
