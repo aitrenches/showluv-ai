@@ -44,7 +44,7 @@ CORS_ALLOWED_ORIGINS = ['https://localhost',
 # CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'api-key',
+    'X-API-Key',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
