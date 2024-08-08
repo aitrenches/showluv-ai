@@ -37,6 +37,7 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = ['djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com', 'localhost', '0.0.0.0', '127.0.0.1',]
 CSRF_TRUSTED_ORIGINS = ['https://localhost','https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com', 'http://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com','https://127.0.0.1']
 CORS_ALLOWED_ORIGINS = ['https://localhost',
+'https://youtube-to-twitter-generator.vercel.app',
 'http://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
 'https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com',
 'https://127.0.0.1', 'http://localhost:3000']
@@ -44,7 +45,7 @@ CORS_ALLOWED_ORIGINS = ['https://localhost',
 # CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'api-key',
+    'X-API-Key',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
