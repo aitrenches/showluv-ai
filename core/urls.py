@@ -31,8 +31,6 @@ schema_view = get_schema_view(
       title="Trenches AI Staff productivity APIs",
       default_version='v1',
       description="YouTube URL to Twitter Thread Generator API",
-    #   description="API for generating Twitter threads from YouTube video urls",
-    #   terms_of_service="https://www.yourapp.com/terms/",
       terms_of_service="TERMS OF SERVICE ON REQUEST",
       contact=openapi.Contact(email="anthonyoliko@gmail.com"),
       license=openapi.License(name="MIT LICENSE"),

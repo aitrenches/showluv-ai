@@ -13,6 +13,11 @@ from rest_framework.throttling import UserRateThrottle
 from .authentication import APIKeyAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import anthropic
+# from transformers import pipeline
+
+# Create an instance of the Anthropics API client
+anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 class YouTubeToTwitterView(APIView):
     authentication_classes = [APIKeyAuthentication]
@@ -67,7 +72,7 @@ class YouTubeToTwitterView(APIView):
         formatted_length = f"{hours} hour(s) {minutes} minutes"
 
         try:
-            twitter_thread = self.generate_twitter_thread(transcript)
+            twitter_thread = self.generate_twitter_thread_using_openai(transcript)
             return Response({   
                                 'video_id' : video_id,
                                 'video_length': formatted_length,
@@ -90,19 +95,32 @@ class YouTubeToTwitterView(APIView):
         except Exception as e:
             return str(e)
     
-    def generate_twitter_thread(self, transcript):
+    def generate_twitter_thread_using_openai(self, transcript):
         openai.api_key = os.getenv("OPENAI_API_KEY")
+
+        user_prompt = f"Generate a Twitter thread from the following YouTube video transcript:\n\n{transcript}\n\nTwitter Thread:"
         
+        system_prompt = '''
+        You are a helpful assistant that generates Twitter threads from YouTube video transcripts.
+        All your response should be in nothing but a key-value JSON format. Do not add any newline(i.e / n) between your response.
+        Do not add any other text other than the JSON response. Format the JSON in the following format:
+        {
+            "1": "This is the first tweet of the thread...",
+            "2": "This is the second tweet of the thread...",
+            "3": "This is the third tweet of the thread...",
+        }
+                        '''
+
         messages = [
-            {"role": "system", "content": "You are a helpful assistant that generates Twitter threads from YouTube video transcripts. Format your response as a JSON array of numbered tweets. Each tweet should be a JSON object with a number as the key and the tweet content as the value. For example: [{'1': 'First tweet content'}, {'2': 'Second tweet content'}]"},
-            {"role": "user", "content": f"Generate a Twitter thread from the following YouTube video transcript:\n\n{transcript}\n\nTwitter Thread:"}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
         ]
         
         try:
             response = openai.chat.completions.create(
                 model="gpt-4-1106-preview",
                 messages=messages,
-                max_tokens=1000,
+                max_tokens=1024,
                 n=1,
                 stop=None,
                 temperature=0.0,
@@ -114,6 +132,89 @@ class YouTubeToTwitterView(APIView):
             return response.choices[0].message.content.strip()
         except Exception as e:
             raise Exception(f"OpenAI API error: {str(e)}")
+
+    def xgenerate_twitter_thread_using_openai(self, transcript):
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+
+        # # Step 1: Calculate the token length
+        # token_threshold = 29000  # You can adjust this value based on the API's token limit
+        
+        # if len(transcript.split()) > token_threshold:
+        #     # Step 2: Summarize the transcript
+        #     summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+        #     transcript_chunks = [transcript[i:i + token_threshold] for i in range(0, len(transcript.split()), token_threshold)]
+            
+        #     summarized_chunks = [summarizer(chunk, max_length=150, min_length=50, do_sample=False)[0]['summary_text'] for chunk in transcript_chunks]
+            
+        #     summarized_transcript = " ".join(summarized_chunks)
+        # else:
+        #     summarized_transcript = transcript
+
+        user_prompt = f"Generate a Twitter thread from the following YouTube video transcript:\n\n{transcript}\n\nTwitter Thread:"
+        
+        system_prompt = '''
+        You are a helpful assistant that generates Twitter threads from YouTube video transcripts.
+        All your response should be in nothing but a key-value JSON format. Do not add any newline(i.e / n) between your response.
+        Do not add any other text other than the JSON response. Format the JSON in the following format:
+        {
+            "1": "This is the first tweet of the thread...",
+            "2": "This is the second tweet of the thread...",
+            "3": "This is the third tweet of the thread...",
+        }
+                        '''
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4-1106-preview",
+                messages=messages,
+                max_tokens=1024,
+                n=1,
+                stop=None,
+                temperature=0.0,
+                top_p=1,
+                frequency_penalty=0.1,
+                presence_penalty=0.1,
+            )
+            
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            raise Exception(f"OpenAI API error: {str(e)}")
+
+    def generate_twitter_thread_using_anthropic(self, transcript):
+
+        user_prompt = f"Generate a Twitter thread from the following YouTube video transcript:\n\n{transcript}\n\nTwitter Thread:"
+        
+        system_prompt = '''
+        You are a helpful assistant that generates Twitter threads from YouTube video transcripts.
+        Do not start with any preamble or opening sentence or whatever e.g: "Here's a Twitter thread summarizing the key points from the YouTube video transcript:",
+        Respond only in the following JSON format without any additional text or newlines:
+        {
+            "1": "This is the first tweet of the thread...",
+            "2": "This is the second tweet of the thread...",
+            "3": "This is the third tweet of the thread..."
+        }
+                        '''
+        
+        try:
+            response = anthropic_client.messages.create(
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": user_prompt}],
+            system=system_prompt,
+            temperature=0.9
+            )
+            
+            # Extract the text from the response content
+            content_text = response.content[0].text
+
+            return content_text
+        except Exception as e:
+            raise Exception(f"Anthropic API error: {str(e)}")
 
 class VideoInfoView(APIView):
     authentication_classes = [APIKeyAuthentication]
