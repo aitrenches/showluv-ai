@@ -26,6 +26,15 @@ from django.conf.urls.static import static
 
 from utility.schema_generator import CustomSchemaGenerator
 
+swagger_info = openapi.Info(
+    title="YouTube Video Summary API",
+    default_version='v1',
+    description="API for summarizing YouTube videos",
+    terms_of_service="TERMS OF SERVICE ON REQUEST",
+    contact=openapi.Contact(email="anthonyoliko@gmail.com"),
+    license=openapi.License(name="MIT License"),
+)
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Trenches AI Staff productivity APIs",
