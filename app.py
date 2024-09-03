@@ -2,10 +2,10 @@ import streamlit as st
 import requests
 
 BACKEND_URL = "http://localhost:8000"
-KEY = "EQq22/s2o9EaXKTJ8EFbKxfoTTuW" 
+KEY = "EQq22/s2o9EaXKTJ8EFbKxfoTTuW"
 
 def main():
-    st.title("YouTube Transcript Summarizer & X Thread Generator")
+    st.title("YouTube Video Repurposer")
     
     youtube_url = st.text_input("Enter YouTube Video URL")
     
@@ -25,16 +25,26 @@ def main():
                     summary = data.get('message', 'No summary available')
                     thread = data.get('thread', 'No thread available')
 
-                    st.success("Summary generated!")
-                    st.write("### Summary")
-                    st.write(summary)
+                    st.success("Congratulations, the Summary and Thread were generated!")
 
-                    st.write("### Twitter Thread")
-                    if thread:
-                        # Display the thread
-                        st.write(thread)
-                    else:
-                        st.write("No thread available.")
+                    # Layout with two columns
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.subheader("Summary")
+                        st.write(summary)
+
+                    with col2:
+                        st.markdown(
+                            """
+                            <div style="background-color: #f0f8ff; padding: 10px;">
+                                <h3>Twitter Thread</h3>
+                                <p>{}</p>
+                            </div>
+                            """.format(thread),
+                            unsafe_allow_html=True
+                        )
+
                 else:
                     st.error(f"Error: {response.json().get('error', 'Unknown error occurred')}")
         else:
