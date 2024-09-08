@@ -29,6 +29,7 @@ environ.Env.read_env()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 API_KEY = env("API_KEY")
+OPENAI_API_KEY = env("OPENAI_API_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = env("DEBUG")
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     'youtube_to_twitter',
     'drf_yasg',
     'corsheaders',
+    'image_gen',
 ]
 
 MIDDLEWARE = [

@@ -11,7 +11,7 @@ Setting up django for production is hard! Using this template will give you a ea
 - 🤑 Serverless deployment for < $7 per month
 
 ## How: 
-- Ever time you commit code to branch `main` --> You trigger a deploy to a new lightsail container automatically
+- Every time you commit code to branch `main` --> You trigger a deploy to a new lightsail container automatically
 - This process is fully automated if you provide the correct credentials in your Github Secrets
 
 ## What can I do with this?
