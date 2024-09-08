@@ -30,6 +30,50 @@ class ImageGenerator(APIView):
         super().__init__()
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
+    @swagger_auto_schema(
+        operation_summary="Generate an image and its variations",
+        operation_description="Generates an image based on a prompt and creates three variations of the generated image.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'prompt': openapi.Schema(type=openapi.TYPE_STRING, description='Text prompt to generate the image'),
+            },
+            required=['prompt']
+        ),
+        responses={
+            200: openapi.Response(
+                description="Successful response with generated and resized images",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'images': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(type=openapi.TYPE_STRING, description='Base64 encoded image'),
+                        ),
+                    }
+                ),
+            ),
+            400: openapi.Response(
+                description="Bad Request Error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message'),
+                    }
+                ),
+            ),
+            500: openapi.Response(
+                description="Internal Server Error",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(type=openapi.TYPE_STRING, description='Error message'),
+                    }
+                ),
+            ),
+        }
+    )
+
     def post(self, request, size):
         prompt = request.data.get('prompt')
 
@@ -43,8 +87,11 @@ class ImageGenerator(APIView):
             return Response({"error": "Invalid size format. Use WIDTHxHEIGHT (e.g., 1024x1024)."}, status=status.HTTP_400_BAD_REQUEST)
     
         try:
+            # Improve the prompt
+            improved_prompt = self.improve_prompt(prompt)
+
             # Generate the initial image
-            image_data = self.generate_image_using_openai_dalle(prompt)
+            image_data = self.generate_image_using_openai_dalle(improved_prompt)
 
             # Generate three variations from the initial image
             variations_data = self.generate_three_variations_from_image_using_openai_dalle(image_data['image'])
@@ -53,11 +100,48 @@ class ImageGenerator(APIView):
             resized_variations = self.resize_images(variations_data['images'], width, height)
 
             return Response(resized_variations, status=status.HTTP_200_OK)
+        
+        except ConnectionError as e:
+            logger.error(f"Connection error occurred: {str(e)}")
+            return Response({"error": "Unable to connect to the image generation service. Please try again later."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
         except Exception as e:
             # Log the exception for debugging purposes
             logger.error(f"Error occurred: {str(e)}")
-            # Return a simple error response
             return Response({"error": "An internal server error occurred. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def improve_prompt(self, prompt):
+
+        user_prompt = f"Generate a better and improved image generation prompt from the following prompt:\n\n{prompt}\n\n"
+        
+        system_prompt = '''
+        You are a helpful assistant that improves image generation prompts to generate better images
+                        '''
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4-1106-preview",
+                messages=messages,
+                max_tokens=1024,
+                n=1,
+                stop=None,
+                temperature=0.0,
+                top_p=1,
+                frequency_penalty=0.1,
+                presence_penalty=0.1,
+            )
+            print('(((((((((((((((((((())))))))))))))))))))')
+            print(response)
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            # print('(((((((((((((((((((( ERROR ))))))))))))))))))))')
+            # return prompt
+            raise Exception(f"OpenAI API error: {str(e)}")
 
     def generate_image_using_openai_dalle(self, prompt):
         """Generates a single image using DALL-E 3."""
