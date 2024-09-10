@@ -10,8 +10,8 @@ import base64
 load_dotenv()
 
 # Django API URL
-API_URL = os.environ("API_URL")
-API_KEY = os.environ("API_KEY")
+API_URL = os.getenv("API_URL")
+API_KEY = os.getenv("API_KEY")
 
 headers = {
     "X-API-KEY": API_KEY
