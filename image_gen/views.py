@@ -1,16 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import os
-import json
-from django.http import JsonResponse
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 from youtube_to_twitter.authentication import APIKeyAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from .models import ImagePrompt, GeneratedImage
 from django.conf import settings
 from openai import OpenAI
 import base64
@@ -75,9 +71,9 @@ class ImageGenerator(APIView):
     )
 
     def post(self, request, size):
-        prompt = request.data.get('prompt')
+        prompt_text = request.data.get('prompt')
 
-        if not prompt:
+        if not prompt_text:
             return Response({"error": "A prompt is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Parse size parameter (e.g., 1024x1024)
@@ -88,7 +84,10 @@ class ImageGenerator(APIView):
     
         try:
             # Improve the prompt
-            improved_prompt = self.improve_prompt(prompt)
+            improved_prompt = self.improve_prompt(prompt_text)
+
+            # Save prompt to the database
+            prompt_instance = ImagePrompt.objects.create(prompt=prompt_text, improved_prompt=improved_prompt)
 
             # Generate the initial image
             image_data = self.generate_image_using_openai_dalle(improved_prompt)
@@ -97,7 +96,7 @@ class ImageGenerator(APIView):
             variations_data = self.generate_three_variations_from_image_using_openai_dalle(image_data['image'])
 
             # Resize the images to the requested size
-            resized_variations = self.resize_images(variations_data['images'], width, height)
+            resized_variations = self.resize_and_save_images(prompt_instance, variations_data['images'], width, height)
 
             return Response(resized_variations, status=status.HTTP_200_OK)
         
@@ -163,13 +162,13 @@ class ImageGenerator(APIView):
         )
         return {"images": [img.b64_json for img in response.data]}
     
-    def resize_images(self, base64_images, width, height):
+    def resize_and_save_images(self, prompt_instance, base64_images, width, height):
         """Resizes the base64 images to the specified dimensions."""
         images = []
 
-        for image in base64_images:
+        for i in base64_images:
             # Decode the base64 image to bytes
-            image_data = base64.b64decode(image)
+            image_data = base64.b64decode(i)
             
             # Open the image from bytes using Pillow
             image = Image.open(BytesIO(image_data))
@@ -181,6 +180,14 @@ class ImageGenerator(APIView):
             buffered = BytesIO()
             resized_image.save(buffered, format="PNG")
             resized_image_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+            # Create and save resized image
+            GeneratedImage.objects.create_variation(
+                prompt=prompt_instance,
+                image_data=i,  # Store as a ContentFile, which will be uploaded to S3
+                width=width,
+                height=height,
+            )
 
             images.append(resized_image_base64)
 
