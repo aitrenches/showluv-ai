@@ -1,0 +1,44 @@
+---
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        name: Black
+        language_version: python3.12
+        stages: [commit, push]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (Python import sorter)
+        language_version: python3.12
+        stages: [commit, push]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: end-of-file-fixer
+        name: Ensure single newline at end of file
+        stages: [commit]
+
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        stages: [commit]
+
+      - id: check-yaml
+        name: YAML Linter
+        stages: [commit]
+
+      - id: check-added-large-files
+        name: Prevent adding large files
+        args: ['--maxkb=500']
+        stages: [commit]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.26.3
+    hooks:
+      - id: yamllint
+        name: YAML Linter
+        stages: [commit]

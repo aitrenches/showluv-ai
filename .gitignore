@@ -12,6 +12,7 @@ db.sqlite3
 
 # Media files
 media/
+generated_images/
 
 # Virtual environment
 venv/
