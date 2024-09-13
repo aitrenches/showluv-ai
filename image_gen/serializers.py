@@ -17,11 +17,13 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         if fields is not None:
-            # Drop any fields that are not specified in the `fields` argument.
+            # Ensure fields exist in the serializer before popping them
             allowed = set(fields)
-            existing = set(self.fields)
+            existing = set(self.fields.keys())
             for field_name in existing - allowed:
-                self.fields.pop(field_name)
+                self.fields.pop(
+                    field_name, None
+                )  # Use `pop(field_name, None)` to avoid KeyErrors when you dont specify fields in the requests
 
 
 class GeneratedImageSerializer(DynamicFieldsModelSerializer):

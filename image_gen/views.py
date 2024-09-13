@@ -130,12 +130,12 @@ class ImageGenerator(APIView):
             if requested_fields:
                 requested_fields = requested_fields.split(",")
 
-            serialized_prompt = ImagePromptSerializer(
-                prompt_instance,
-                fields=requested_fields
-                if requested_fields
-                else ["uuid", "prompt", "images"],
-            )
+                serialized_prompt = ImagePromptSerializer(
+                    prompt_instance,
+                    fields=requested_fields
+                    if requested_fields
+                    else ["uuid", "prompt", "images"],
+                )
 
             return Response(resized_variations, status=status.HTTP_200_OK)
 
@@ -149,7 +149,6 @@ class ImageGenerator(APIView):
             )
 
         except Exception as e:
-            # Log the exception for debugging purposes
             logger.error(f"Error occurred: {str(e)}")
             return Response(
                 {"error": "An internal server error occurred. Please try again later."},
@@ -196,6 +195,8 @@ class ImageGenerator(APIView):
             n=1,
             response_format="b64_json",
         )
+        print("(((((((((((((((((((())))))))))))))))))))")
+        print("image generated")
         return {"image": response.data[0].b64_json}
 
     def generate_three_variations_from_image_using_openai_dalle(self, base64_image):
@@ -206,6 +207,8 @@ class ImageGenerator(APIView):
             n=3,
             response_format="b64_json",
         )
+        print("(((((((((((((((((((())))))))))))))))))))")
+        print("three variations generated")
         return {"images": [img.b64_json for img in response.data]}
 
     def resize_and_save_images(self, prompt_instance, base64_images, width, height):
@@ -234,7 +237,9 @@ class ImageGenerator(APIView):
                 width=width,
                 height=height,
             )
-
+            print("(((((((((((((((((((())))))))))))))))))))")
+            print("three images saved")
             images.append(resized_image_base64)
-
+        print("(((((((((((((((((((())))))))))))))))))))")
+        print("three images resized")
         return {"images": images}
