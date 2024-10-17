@@ -85,7 +85,7 @@ class AddQuantitySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Retrieve the product instance from validated data
-        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print('@@@@@@@@@@@@@@@@@@validated_data@@@@@@@@@@@@@@@@@@@@')
         print(validated_data)
         print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         product = validated_data['product']
@@ -99,7 +99,10 @@ class AddQuantitySerializer(serializers.Serializer):
             quantity=validated_data['quantity']
         )
 
-        return product
+        return {
+            'message': f"Product {product.name} updated successfully",
+            'updated_quantity': product.quantity
+        }
 
 class SellProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
