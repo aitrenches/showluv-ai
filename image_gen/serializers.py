@@ -85,7 +85,9 @@ class AddQuantitySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Retrieve the product instance from validated data
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         print(validated_data)
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         product = validated_data['product']
         product.quantity += validated_data['quantity']
         product.save()
