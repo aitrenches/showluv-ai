@@ -3,6 +3,7 @@ import logging
 from io import BytesIO
 
 from django.conf import settings
+from django.http import Http404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from openai import OpenAI
@@ -263,7 +264,6 @@ class ProductCreateView(generics.CreateAPIView):
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'pk'
 
     @swagger_auto_schema(
         responses={
@@ -273,6 +273,19 @@ class ProductDetailView(generics.RetrieveAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+    
+    def get_object(self):
+        lookup_value = self.kwargs.get('pk')
+
+        try:
+            # If lookup_value is an integer, assume it's a primary key
+            lookup_value = int(lookup_value)
+            return Product.objects.get(pk=lookup_value)
+        except ValueError:
+            # If ValueError occurs, it means lookup_value is not an integer, so we search by productName
+            return Product.objects.get(productName=lookup_value)
+        except Product.DoesNotExist:
+            raise Http404("Product not found.")
 
 class AddQuantityView(generics.CreateAPIView):
     serializer_class = AddQuantitySerializer
