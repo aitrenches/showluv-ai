@@ -92,10 +92,10 @@ class AddQuantitySerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        product = validated_data['product']  # We now have the product instance
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+        product = validated_data.pop('product')  # We now have the product instance
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         print("Validated data: ", validated_data)
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         product.quantity += validated_data['quantity']
         product.save()
 
