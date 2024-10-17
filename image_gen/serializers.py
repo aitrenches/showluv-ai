@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import GeneratedImage, ImagePrompt, Product, ProductBatch, UnitMeasurement, Category, Sale
+from .models import GeneratedImage, ImagePrompt, Product, ProductBatchGood, UnitMeasurement, Category, Sale
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -69,9 +69,9 @@ class ProductSerializer(serializers.ModelSerializer):
             UnitMeasurement.objects.create(product=product, **unit_data)
         return product
 
-class ProductBatchSerializer(serializers.ModelSerializer):
+class ProductBatchGoodSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductBatch
+        model = ProductBatchGood
         fields = ['product', 'quantity', 'cost_price', 'added_on']
 
 class AddProductQuantitySerializer(serializers.Serializer):
@@ -94,7 +94,7 @@ class AddProductQuantitySerializer(serializers.Serializer):
         cost_price = validated_data['cost_price']
 
         # Add new batch for the product
-        ProductBatch.objects.create(product=product, quantity=quantity, cost_price=cost_price)
+        ProductBatchGood.objects.create(product=product, quantity=quantity, cost_price=cost_price)
 
         # Update product's total quantity
         product.quantity += quantity
