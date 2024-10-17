@@ -7,7 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from openai import OpenAI
 from PIL import Image
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
@@ -15,8 +15,8 @@ from rest_framework.views import APIView
 
 from youtube_to_twitter.authentication import APIKeyAuthentication
 
-from .models import GeneratedImage, ImagePrompt
-from .serializers import GeneratedImageSerializer, ImagePromptSerializer
+from .models import GeneratedImage, ImagePrompt, Product, Sale
+from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, AddQuantitySerializer, SellProductSerializer, SaleSerializer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -243,3 +243,74 @@ class ImageGenerator(APIView):
         print("(((((((((((((((((((())))))))))))))))))))")
         print("three images resized")
         return {"images": images}
+
+######################## TEST 2 Start ##############################
+
+class ProductCreateView(generics.CreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    @swagger_auto_schema(
+        request_body=ProductSerializer,
+        responses={
+            status.HTTP_201_CREATED: ProductSerializer,
+            status.HTTP_400_BAD_REQUEST: 'Bad Request',
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+class ProductDetailView(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: ProductSerializer,
+            status.HTTP_404_NOT_FOUND: 'Product not found',
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class AddQuantityView(generics.CreateAPIView):
+    serializer_class = AddQuantitySerializer
+
+    @swagger_auto_schema(
+        request_body=AddQuantitySerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response('Product quantity updated successfully'),
+            status.HTTP_400_BAD_REQUEST: 'Bad Request',
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+class SellProductView(generics.CreateAPIView):
+    serializer_class = SellProductSerializer
+
+    @swagger_auto_schema(
+        request_body=SellProductSerializer,
+        responses={
+            status.HTTP_200_OK: openapi.Response('Product sold successfully'),
+            status.HTTP_400_BAD_REQUEST: 'Bad Request',
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+class SalesHistoryView(generics.ListAPIView):
+    queryset = Sale.objects.all()
+    serializer_class = SaleSerializer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: SaleSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Sales history not found',
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+######################## TEST 2 End ##############################

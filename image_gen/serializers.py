@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from .models import GeneratedImage, ImagePrompt
+from .models import GeneratedImage, ImagePrompt, Product, ProductBatch, UnitMeasurement, Category, Sale
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -38,3 +37,88 @@ class ImagePromptSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImagePrompt
         fields = ["uuid", "prompt", "improved_prompt", "created_at", "images"]
+
+######################## TEST 2 Start ##############################
+
+class UnitMeasurementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnitMeasurement
+        fields = ['unit_name', 'unit_selling_price']
+
+class ProductSerializer(serializers.ModelSerializer):
+    unit_measurements = UnitMeasurementSerializer(many=True)
+    
+    class Meta:
+        model = Product
+        fields = ['name', 'quantity', 'selling_price', 'cost_price', 'category', 'unit_measurements']
+
+    def create(self, validated_data):
+        unit_measurements_data = validated_data.pop('unit_measurements')
+        product = Product.objects.create(**validated_data)
+        for unit_data in unit_measurements_data:
+            UnitMeasurement.objects.create(product=product, **unit_data)
+        return product
+
+class ProductBatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductBatch
+        fields = ['cost_price', 'quantity']
+
+class AddQuantitySerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    cost_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    
+    def validate(self, data):
+        # Ensure product exists
+        try:
+            product = Product.objects.get(id=data['product_id'])
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found")
+        return data
+
+    def create(self, validated_data):
+        product = Product.objects.get(id=validated_data['product_id'])
+        product.quantity += validated_data['quantity']
+        product.save()
+        ProductBatch.objects.create(
+            product=product, 
+            cost_price=validated_data['cost_price'], 
+            quantity=validated_data['quantity']
+        )
+        return product
+
+class SellProductSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    units = serializers.IntegerField()
+    unit_type = serializers.CharField()  # Pack, Carton, etc.
+
+    def validate(self, data):
+        # Check if product exists and has enough quantity
+        try:
+            product = Product.objects.get(id=data['product_id'])
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found")
+        
+        unit_measurement = product.unit_measurements.filter(unit_name=data['unit_type']).first()
+        if not unit_measurement:
+            raise serializers.ValidationError(f"Unit type {data['unit_type']} not found.")
+        
+        if product.quantity < data['units']:
+            raise serializers.ValidationError("Insufficient quantity.")
+        
+        return data
+
+    def create(self, validated_data):
+        # Deduct quantity, track profit, and save sale
+        product = Product.objects.get(id=validated_data['product_id'])
+        product.quantity -= validated_data['units']
+        product.save()
+        return product
+
+class SaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sale
+        fields = '__all__'
+
+######################## TEST 2 End ##############################

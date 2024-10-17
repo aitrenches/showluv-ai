@@ -14,6 +14,11 @@ RUN pip install -r requirements.txt
 
 # Copy the content of the local src directory to the working directory
 COPY . .
+
+# Run migrations
+RUN python3 manage.py makemigrations
+RUN python3 manage.py migrate
+
 # Specify the command to run on container start
 #CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 CMD [ "uwsgi", "--http", "0.0.0.0:8000", \
