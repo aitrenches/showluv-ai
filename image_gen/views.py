@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from youtube_to_twitter.authentication import APIKeyAuthentication
 
 from .models import GeneratedImage, ImagePrompt, Product, Sale
-from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, AddQuantitySerializer, SellProductSerializer, SaleSerializer
+from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, AddQuantitySerializer, SellProductSerializer, SaleSerializer, AddProductQuantitySerializer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -286,21 +286,18 @@ class ProductDetailView(generics.RetrieveAPIView):
             return Product.objects.get(name=lookup_value)
         except Product.DoesNotExist:
             raise Http404("Product not found.")
-
-class AddQuantityView(generics.CreateAPIView):
-    serializer_class = AddQuantitySerializer
+    
+class AddProductQuantityView(generics.CreateAPIView):
+    serializer_class = AddProductQuantitySerializer
 
     @swagger_auto_schema(
-        request_body=AddQuantitySerializer,
+        request_body=AddProductQuantitySerializer,
         responses={
-            status.HTTP_200_OK: openapi.Response('Product quantity updated successfully'),
-            status.HTTP_400_BAD_REQUEST: 'Bad Request',
+            status.HTTP_201_CREATED: "Product quantity added successfully",
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
         }
     )
     def post(self, request, *args, **kwargs):
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-        print("Incoming payload: ", request.data)
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
         return super().post(request, *args, **kwargs)
 
 class SellProductView(generics.CreateAPIView):

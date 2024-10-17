@@ -72,45 +72,35 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductBatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductBatch
-        fields = ['cost_price', 'quantity']
+        fields = ['product', 'quantity', 'cost_price', 'added_on']
 
-class AddQuantitySerializer(serializers.Serializer):
+class AddProductQuantitySerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField()
     cost_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def validate(self, data):
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-        print("Data in validate method: ", data)
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-        # Ensure product exists
+        # Check if the product exists
         try:
             product = Product.objects.get(id=data['product_id'])
+            data['product'] = product
         except Product.DoesNotExist:
-            raise serializers.ValidationError("Product not found")
-        data['product'] = product  # Add the product instance to validated data
+            raise serializers.ValidationError("Product not found.")
         return data
 
     def create(self, validated_data):
-        product = validated_data.pop('product')  # We now have the product instance
-        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        print("Validated data: ", validated_data)
-        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        product.quantity += validated_data['quantity']
+        product = validated_data['product']
+        quantity = validated_data['quantity']
+        cost_price = validated_data['cost_price']
+
+        # Add new batch for the product
+        ProductBatch.objects.create(product=product, quantity=quantity, cost_price=cost_price)
+
+        # Update product's total quantity
+        product.quantity += quantity
         product.save()
 
-        # Create a new ProductBatch to track cost and quantity added
-        ProductBatch.objects.create(
-            product=product, 
-            cost_price=validated_data['cost_price'], 
-            quantity=validated_data['quantity']
-        )
-
-        # Return a success message
-        return {
-            'message': f"Product {product.name} updated successfully",
-            'updated_quantity': product.quantity
-        }
+        return product
 
 class SellProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
