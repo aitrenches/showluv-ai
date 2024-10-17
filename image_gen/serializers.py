@@ -75,22 +75,20 @@ class ProductBatchSerializer(serializers.ModelSerializer):
         fields = ['cost_price', 'quantity']
 
 class AddQuantitySerializer(serializers.Serializer):
-    product_id = serializers.IntegerField()
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     quantity = serializers.IntegerField()
     cost_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    
+
     def validate(self, data):
-        # Ensure product exists
-        try:
-            product = Product.objects.get(id=data['product_id'])
-        except Product.DoesNotExist:
-            raise serializers.ValidationError("Product not found")
+        # Ensure that product exists (PrimaryKeyRelatedField will handle this validation automatically)
         return data
 
     def create(self, validated_data):
-        product = Product.objects.get(id=validated_data['product_id'])
+        product = validated_data['product']
         product.quantity += validated_data['quantity']
         product.save()
+
+        # Create a new ProductBatch entry to track this addition
         ProductBatch.objects.create(
             product=product, 
             cost_price=validated_data['cost_price'], 
