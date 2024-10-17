@@ -80,6 +80,9 @@ class AddQuantitySerializer(serializers.Serializer):
     cost_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def validate(self, data):
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+        print("Data in validate method: ", data)
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
         # Ensure product exists
         try:
             product = Product.objects.get(id=data['product_id'])
@@ -90,6 +93,9 @@ class AddQuantitySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         product = validated_data['product']  # We now have the product instance
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+        print("Validated data: ", validated_data)
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
         product.quantity += validated_data['quantity']
         product.save()
 

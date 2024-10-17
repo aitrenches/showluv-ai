@@ -298,6 +298,9 @@ class AddQuantityView(generics.CreateAPIView):
         }
     )
     def post(self, request, *args, **kwargs):
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+        print("Incoming payload: ", request.data)
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
         return super().post(request, *args, **kwargs)
 
 class SellProductView(generics.CreateAPIView):
