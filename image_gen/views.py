@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from youtube_to_twitter.authentication import APIKeyAuthentication
 
 from .models import GeneratedImage, ImagePrompt, Product, Sale
-from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, AddQuantitySerializer, SellProductSerializer, SaleSerializer, AddProductQuantitySerializer
+from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, SellProductSerializer, SaleSerializer, AddProductQuantitySerializer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
