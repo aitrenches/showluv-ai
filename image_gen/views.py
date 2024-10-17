@@ -283,7 +283,7 @@ class ProductDetailView(generics.RetrieveAPIView):
             return Product.objects.get(pk=lookup_value)
         except ValueError:
             # If ValueError occurs, it means lookup_value is not an integer, so we search by productName
-            return Product.objects.get(productName=lookup_value)
+            return Product.objects.get(name=lookup_value)
         except Product.DoesNotExist:
             raise Http404("Product not found.")
 

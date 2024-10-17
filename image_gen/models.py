@@ -50,14 +50,14 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    productName = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     quantity = models.PositiveIntegerField()
     selling_price = models.DecimalField(max_digits=10, decimal_places=2)
     cost_price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.productName
+        return self.name
 
 class UnitMeasurement(models.Model):
     product = models.ForeignKey(Product, related_name='unit_measurements', on_delete=models.CASCADE)
@@ -65,7 +65,7 @@ class UnitMeasurement(models.Model):
     unit_selling_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.product.productName} - {self.unit_name}"
+        return f"{self.product.name} - {self.unit_name}"
 
 class ProductBatch(models.Model):
     product = models.ForeignKey(Product, related_name='batches', on_delete=models.CASCADE)
