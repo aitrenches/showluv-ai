@@ -47,14 +47,24 @@ class UnitMeasurementSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     unit_measurements = UnitMeasurementSerializer(many=True)
+    category = serializers.CharField()
     
     class Meta:
         model = Product
         fields = ['name', 'quantity', 'selling_price', 'cost_price', 'category', 'unit_measurements']
 
+    def validate_category(self, value):
+        """
+        Check if the category exists by name. If it doesn't exist, create it.
+        """
+        category_name = value.strip()  # Clean the input
+        category, created = Category.objects.get_or_create(name=category_name)
+        return category  # Return the Category instance (this will be saved in the Product model)
+
     def create(self, validated_data):
         unit_measurements_data = validated_data.pop('unit_measurements')
-        product = Product.objects.create(**validated_data)
+        category = validated_data.pop('category')  # Get the category from validated data
+        product = Product.objects.create(category=category, **validated_data)
         for unit_data in unit_measurements_data:
             UnitMeasurement.objects.create(product=product, **unit_data)
         return product
