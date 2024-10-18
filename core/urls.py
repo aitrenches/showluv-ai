@@ -27,9 +27,9 @@ from django.conf.urls.static import static
 from utility.schema_generator import CustomSchemaGenerator
 
 swagger_info = openapi.Info(
-    title="YouTube Video Summary API",
+    title="Demo APIs",
     default_version='v1',
-    description="API for summarizing YouTube videos",
+    # description="API for summarizing YouTube videos",
     terms_of_service="TERMS OF SERVICE ON REQUEST",
     contact=openapi.Contact(email="anthonyoliko@gmail.com"),
     license=openapi.License(name="MIT License"),
@@ -37,9 +37,10 @@ swagger_info = openapi.Info(
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Trenches AI Staff productivity APIs",
+    #   title="Trenches AI Staff productivity APIs",
+      title="Demo APIs",
       default_version='v1',
-      description="YouTube URL to Twitter Thread Generator API",
+      description="Test APIs",
       terms_of_service="TERMS OF SERVICE ON REQUEST",
       contact=openapi.Contact(email="anthonyoliko@gmail.com"),
       license=openapi.License(name="MIT LICENSE"),
@@ -53,8 +54,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', views.home, name='home'),
-    path('api/', include('youtube_to_twitter.urls')),
-    path('image_gen/', include('image_gen.urls')),
+    # path('api/', include('youtube_to_twitter.urls')),
+    # path('image_gen/', include('image_gen.urls')),
+    path('test2/', include('test2.urls')),
 ]
 
 urlpatterns += [

@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'image_gen',
+    'test2',
 ]
 
 MIDDLEWARE = [

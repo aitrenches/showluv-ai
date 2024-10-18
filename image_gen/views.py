@@ -16,8 +16,8 @@ from rest_framework.views import APIView
 
 from youtube_to_twitter.authentication import APIKeyAuthentication
 
-from .models import GeneratedImage, ImagePrompt, Product, Sale
-from .serializers import GeneratedImageSerializer, ImagePromptSerializer, ProductSerializer, SellProductSerializer, SaleSerializer, AddProductQuantitySerializer
+from .models import GeneratedImage, ImagePrompt
+from .serializers import ImagePromptSerializer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -245,85 +245,3 @@ class ImageGenerator(APIView):
         print("three images resized")
         return {"images": images}
 
-######################## TEST 2 Start ##############################
-
-class ProductCreateView(generics.CreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-    @swagger_auto_schema(
-        request_body=ProductSerializer,
-        responses={
-            status.HTTP_201_CREATED: ProductSerializer,
-            status.HTTP_400_BAD_REQUEST: 'Bad Request',
-        }
-    )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-class ProductDetailView(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-    @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: ProductSerializer,
-            status.HTTP_404_NOT_FOUND: 'Product not found',
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-    
-    def get_object(self):
-        lookup_value = self.kwargs.get('pk')
-
-        try:
-            # If lookup_value is an integer, assume it's a primary key
-            lookup_value = int(lookup_value)
-            return Product.objects.get(pk=lookup_value)
-        except ValueError:
-            # If ValueError occurs, it means lookup_value is not an integer, so we search by productName
-            return Product.objects.get(name=lookup_value)
-        except Product.DoesNotExist:
-            raise Http404("Product not found.")
-    
-class AddProductQuantityView(generics.CreateAPIView):
-    serializer_class = AddProductQuantitySerializer
-
-    @swagger_auto_schema(
-        request_body=AddProductQuantitySerializer,
-        responses={
-            status.HTTP_201_CREATED: "Product quantity added successfully",
-            status.HTTP_400_BAD_REQUEST: "Bad Request",
-        }
-    )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-class SellProductView(generics.CreateAPIView):
-    serializer_class = SellProductSerializer
-
-    @swagger_auto_schema(
-        request_body=SellProductSerializer,
-        responses={
-            status.HTTP_200_OK: openapi.Response('Product sold successfully'),
-            status.HTTP_400_BAD_REQUEST: 'Bad Request',
-        }
-    )
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-class SalesHistoryView(generics.ListAPIView):
-    queryset = Sale.objects.all()
-    serializer_class = SaleSerializer
-
-    @swagger_auto_schema(
-        responses={
-            status.HTTP_200_OK: SaleSerializer(many=True),
-            status.HTTP_404_NOT_FOUND: 'Sales history not found',
-        }
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-######################## TEST 2 End ##############################
