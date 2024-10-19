@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from youtube_to_twitter.authentication import APIKeyAuthentication
 
-from .models import Product, Sale, ProductBatch
+from .models import Product, Sale, ProductBatch, UnitMeasurement
 from .serializers import ProductSerializer, SellProductSerializer, SaleSerializer, AddProductQuantitySerializer
 
 # Get an instance of a logger
@@ -79,7 +79,6 @@ class AddProductQuantityView(generics.CreateAPIView):
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
-
 class SellProductView(generics.CreateAPIView):
     serializer_class = SellProductSerializer
 
@@ -95,6 +94,15 @@ class SellProductView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         product = serializer.validated_data['product']
         quantity_to_sell = serializer.validated_data['quantity']
+        unit_measurement_name = serializer.validated_data.get('unit_measurement')
+
+        # Retrieve the correct unit measurement's selling price
+        try:
+            unit_measurement = UnitMeasurement.objects.get(product=product, unit_name=unit_measurement_name)
+        except UnitMeasurement.DoesNotExist:
+            return Response({"error": f"Unit measurement '{unit_measurement_name}' not found for product."}, status=status.HTTP_400_BAD_REQUEST)
+
+        selling_price_per_unit = unit_measurement.unit_selling_price
 
         # Track total cost and profit
         total_cost_price = 0
@@ -124,8 +132,8 @@ class SellProductView(generics.CreateAPIView):
         product.quantity -= serializer.validated_data['quantity']
         product.save()
 
-        # Calculate selling price and profit
-        total_selling_price = serializer.validated_data['quantity'] * product.selling_price
+        # Calculate total selling price using the unit's selling price and the profit
+        total_selling_price = serializer.validated_data['quantity'] * selling_price_per_unit
         total_profit = total_selling_price - total_cost_price
 
         # Save sales history (optional)
@@ -138,7 +146,7 @@ class SellProductView(generics.CreateAPIView):
         )
 
         response_data = {
-            'message': f"Product {product.name} sold successfully",
+            'message': f"{product.name} sold successfully",
             'quantity_sold': serializer.validated_data['quantity'],
             'total_selling_price': total_selling_price,
             'total_cost_price': total_cost_price,
@@ -147,7 +155,6 @@ class SellProductView(generics.CreateAPIView):
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
-
 
 class SalesHistoryView(generics.ListAPIView):
     queryset = Sale.objects.all()
