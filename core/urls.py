@@ -54,8 +54,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', views.home, name='home'),
-    # path('api/', include('youtube_to_twitter.urls')),
-    # path('image_gen/', include('image_gen.urls')),
+    path('api/', include('youtube_to_twitter.urls')),
+    path('image_gen/', include('image_gen.urls')),
     path('test2/', include('test2.urls')),
 ]
 
