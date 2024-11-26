@@ -57,6 +57,7 @@ urlpatterns = [
     path('api/', include('youtube_to_twitter.urls')),
     path('image_gen/', include('image_gen.urls')),
     path('test2/', include('test2.urls')),
+    path('snet/', include('photrek.urls')),
 ]
 
 urlpatterns += [

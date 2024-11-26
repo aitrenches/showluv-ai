@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'image_gen',
     'test2',
+    'photrek',
 ]
 
 MIDDLEWARE = [

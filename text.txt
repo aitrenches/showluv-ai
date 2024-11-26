@@ -1,0 +1,8 @@
+organization_id = Photrek
+service_id = risk-aware-assessment
+pk = 5957d62a4e9aa8c46c6cfc2abf33ad4e13499c0b2e72cf6ab0dcacfe41cc39df
+fpk = 13c6f1eb3d415e7601981d335605d0292b46363364a1c6b74b6624410ee5cd8b
+pk_name = oliko
+fpk_name = foliko
+
+snet identity create foliko key --private-key 13c6f1eb3d415e7601981d335605d0292b46363364a1c6b74b6624410ee5cd8b

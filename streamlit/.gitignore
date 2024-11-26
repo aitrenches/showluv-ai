@@ -1,2 +1,3 @@
 # Ignore local configuration
 .env
+.streamlit/secrets.toml

@@ -1,20 +1,17 @@
 import os
-from dotenv import load_dotenv
 import streamlit as st
 import requests
 from PIL import Image
 from io import BytesIO
 import base64
+import environ
 
-# Load environment variables from .env file
-load_dotenv()
+env = environ.Env()
+environ.Env.read_env()
 
 # Django API URL
-# API_URL = os.getenv("API_URL")
-# API_KEY = os.getenv("API_KEY")
-
-API_URL = "https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com/image_gen/generate-image/"
-API_KEY = "EQq22/s2o9EaXKTJ8EFbKxfoTTuW"
+API_URL = env("API_URL")
+API_KEY = env("API_KEY")
 
 headers = {
     "X-API-KEY": API_KEY

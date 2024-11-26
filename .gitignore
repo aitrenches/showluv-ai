@@ -47,3 +47,4 @@ dev_db.sqlite3
 
 # Ignore pipenv virtual environment
 Pipfile.lock
+streamlit/.streamlit/secrets.toml
