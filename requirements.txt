@@ -125,10 +125,10 @@ pyDes==2.0.1
 pyelftools==0.31
 Pygments==2.18.0
 pymultihash==0.8.2
-pyobjc-core==10.3.1
-pyobjc-framework-Cocoa==10.3.1
-pyobjc-framework-CoreBluetooth==10.3.1
-pyobjc-framework-libdispatch==10.3.1
+# pyobjc-core==10.3.1
+# pyobjc-framework-Cocoa==10.3.1
+# pyobjc-framework-CoreBluetooth==10.3.1
+# pyobjc-framework-libdispatch==10.3.1
 pyparsing==3.1.2
 pyrsistent==0.20.0
 pyserial==3.5
