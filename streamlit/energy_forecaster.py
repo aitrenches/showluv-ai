@@ -11,6 +11,10 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+# Path to the image
+dashboard_image_path = "energy-management-dashboard.png"
+side_bar_image_path = "energy_image.jpeg"
+
 # API_URL = st.secrets["API_URL"]
 # API_KEY = st.secrets["API_KEY"]
 
@@ -33,7 +37,6 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main-header {
-        background-color: #4CAF50;
         color: white;
         padding: 20px;
         text-align: center;
@@ -51,12 +54,32 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Display the image
+st.image(dashboard_image_path, caption="This is a JPEG image 🙄", use_container_width=True)
+
 st.markdown('<h3 class="sub-header">Upload Your Data and Explore Insights</h3>', unsafe_allow_html=True)
+
+# Sidebar Animation
+st.sidebar.markdown("""
+<style>
+    .sidebar-banner {
+        background-color: #4CAF50;  /* Green color */
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+</style>
+<div class="sidebar-banner">
+    Energy Forecaster
+</div>
+""", unsafe_allow_html=True)
 
 st.sidebar.title("Navigation")
 menu = st.sidebar.radio("Select Page", ["🔍 Analyze Data", "📊 Insights & Trends"])
 
-# Sidebar Animation
 st.sidebar.title("Quick Stats")
 scrolling_text = """
 Energy Insights:
@@ -65,6 +88,43 @@ Energy Insights:
 - Forecast Accuracy: 94%
 """
 st.sidebar.info(scrolling_text)
+
+# Sidebar Header
+st.sidebar.header("Energy Management")
+
+# Sidebar Subsections
+st.sidebar.subheader("Did You Know?")
+st.sidebar.markdown("""
+- 🌍 **40%** of global energy consumption comes from buildings.
+- 💡 Switching to LED bulbs can save up to **75%** of lighting energy.
+- 🌡️ Smart thermostats reduce energy usage by **10-12%** on average.
+""")
+
+# Display an image
+st.sidebar.image(side_bar_image_path, caption="Naira/kWh Cost Savings - Nov 2024", use_container_width=True)
+
+st.sidebar.subheader("Energy Saving Tips")
+st.sidebar.markdown("""
+1. 💡 Turn off lights when leaving a room.
+2. 🏠 Use energy-efficient appliances.
+3. 🧳 Insulate your home to reduce heating and cooling costs.
+4. 🔧 Schedule regular maintenance for HVAC systems.
+5. 🔌 Unplug devices when not in use to avoid phantom energy consumption.
+""")
+
+st.sidebar.subheader("Quick Tools")
+st.sidebar.markdown("""
+- [Calculate Your Carbon Footprint](https://www.carbonfootprint.com/calculator.aspx)
+- [Energy Star Home Advisor](https://www.energystar.gov)
+""")
+
+# Contact the Developer
+st.sidebar.subheader("Contact the Developer")
+st.sidebar.markdown("""
+For any inquiries, feedback, or support, feel free to reach out:
+
+📧 **Email**: [anthonyoliko@gmail.com](mailto:anthonyoliko@gmail.com)
+""")
 
 # Main Layout
 # tab1, tab2 = st.tabs(["🔍 Analyze Data", "📊 Insights & Trends"])
