@@ -6,15 +6,13 @@ import altair as alt
 import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-from adr_axs5pmspipgz5k7qdqjo9nswtc_pb2 import ADRReturnFloat
 import environ
 
 env = environ.Env()
 environ.Env.read_env()
 
-API_URL = env("API_URL")
-API_KEY = env("API_KEY")
+API_URL = st.secrets["general"]["API_URL"]
+API_KEY = st.secrets["general"]["API_KEY"]
 
 headers = {
     "X-API-KEY": API_KEY
@@ -226,7 +224,7 @@ if menu == "🔍 Analyze Data":
                         if img:
                             st.subheader("Generated Chart")
                             decoded_img = base64.b64decode(img)  # Decode the Base64 string
-                            st.image(decoded_img, caption="Generated Image", use_column_width=True)
+                            st.image(decoded_img, caption="Generated Image", use_container_width=True)
 
                         # Additional Information
                         st.subheader("Additional Information")
