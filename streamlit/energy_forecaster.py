@@ -11,8 +11,8 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
-API_URL = st.secrets["general"]["API_URL"]
-API_KEY = st.secrets["general"]["API_KEY"]
+API_URL = st.secrets["API_URL"]
+API_KEY = st.secrets["API_KEY"]
 
 headers = {
     "X-API-KEY": API_KEY
