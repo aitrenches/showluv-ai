@@ -11,8 +11,11 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
-API_URL = st.secrets["API_URL"]
-API_KEY = st.secrets["API_KEY"]
+# API_URL = st.secrets["API_URL"]
+# API_KEY = st.secrets["API_KEY"]
+
+API_URL = "https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com/snet/energy-forecast/"
+API_KEY = "EQq22/s2o9EaXKTJ8EFbKxfoTTuW"
 
 headers = {
     "X-API-KEY": API_KEY
