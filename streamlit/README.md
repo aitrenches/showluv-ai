@@ -58,7 +58,7 @@ The Django backend powers the analysis workflow:
     - The number of rows and columns processed.
     - A dynamically generated chart visualizing probabilities.
 
-### **2. `backend/views.py`**
+### **2. `photrek/views.py`**
 - Contains the `EnergyForecastAPI` Django class-based view.
 - Key functionalities:
   - Validates API keys using custom middleware.
@@ -71,13 +71,16 @@ The Django backend powers the analysis workflow:
 ## **Folder Structure**
 ```
 project/
-├── backend/
+
+├── core/
+│   ├── .env                    # env file
+│   └── settings.py             # Django settings, including API key configurations
+├── photrek/
 │   ├── views.py                # Django backend logic
 │   ├── urls.py                 # API routing
-│   └── settings.py             # Django settings, including API key configurations
 ├── streamlit/
 │   ├── energy_forecaster.py    # Streamlit app frontend
-│   └── assets/                 # Contains any images or static files
+│   └── .streamlit/             # Contains config ffiles
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Project documentation
 └── manage.py                   # Django project entry point
@@ -117,8 +120,8 @@ pip install -r requirements.txt
 - Create a `.env` file in the project root:
   ```bash
   DJANGO_SECRET_KEY=<your_secret_key>
-  API_URL=<your_photrek_service_endpoint>
-  API_KEY=<your_photrek_api_key>
+  API_URL=<backend_service_endpoint>
+  API_KEY=<service_api_key>
   PRIVATE_KEY=13c6f1eb3d45cd8b...
   INFURA_KEY=ea8b3576878979756f533f...
   ```

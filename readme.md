@@ -1,93 +1,157 @@
-# Django Project Deployment on AWS LightSail Containers via GitHub Actions.
-## Why: 
-Setting up django for production is hard! Using this template will give you a easy deployment that comes out of the box with: 
-- 🐳 Container service (Easily scale both horizontally and vertically in AWS lightsail)
-- 🔐 SSL Certificate on connection
-- 🦺 Safety: if your build fails -> the old container will stay live so you site won't go down
-- 🌎 Nginx reverse proxy integrated with uwsgi no set up required
-- 🗂 S3 file storage configured out of the box ready to use in django
-- 🤐 Environment secrets tucked away in your repository secrets (so easy to collaborate)
-- 🏎 From code commit to deployed in less than 5 minutes
-- 🤑 Serverless deployment for < $7 per month
+Check out the Streamlit frontend here: https://energy-forecaster.streamlit.app
 
-## How: 
-- Every time you commit code to branch `main` --> You trigger a deploy to a new lightsail container automatically
-- This process is fully automated if you provide the correct credentials in your Github Secrets
+---
 
-## What can I do with this?
-- You can build anything you like, without the hassle of setting up reverse proxies, docker containers, updating servers, ssl Sertificate
-- Just go wild on your app without the hassle of hosting. 
+# **Energy Consumption Forecaster**
 
-# Installation
+## **Overview**
+Welcome to the **Energy Consumption Forecaster**, a tool designed to analyze and forecast energy consumption for residential estates using Photrek's Risk-Aware Assessment Service. This application was built for the **SingularityNET Platform Hackathon**, leveraging the SingularityNET SDK to integrate Photrek’s robust metrics: **Accuracy**, **Decisiveness**, and **Robustness**.
 
+By providing probabilistic forecasts for energy consumption, this tool empowers users with actionable insights into energy usage patterns, helping them make informed decisions about energy efficiency and management.
 
-## Prerequisites and testing locally
-- [ ] Have Python3 installed
-- [ ] run `brew install mysql` - in case you have don't have this
-- [ ] run `pip3 install -r requirements.txt` to get all requirements for template
-- [ ] fill in the `core/.env` file with your app's details. I provided a sample in the `core` folder
-- [ ] run `python3 manage.py runserver` to check if the app is working on your local machine
+---
 
+## **Core Features**
+1. **Streamlit Frontend**:
+   - Upload a CSV file containing probabilistic energy forecasts.
+   - View visualizations of the input data and results.
+   - Receive detailed metrics, including Accuracy, Decisiveness, and Robustness.
+   - Access a dynamically generated chart based on Photreks assessment.
 
-## Steps
+2. **Django Backend**:
+   - Processes uploaded CSV files and prepares them for Photrek's service.
+   - Validates API keys for secure access.
+   - Interacts with Photrek’s Risk-Aware Assessment Service via the SingularityNET SDK.
+   - Returns metrics and a base64-encoded image for visualization.
 
-### 0. 
-- I assume you have cloned the repo to your github account
-- You have a AWS account and can log in to http://lightsail.aws.amazon.com 
+---
 
-### 1. Configure AWS LightSail Container Service
+## **How It Works**
+### **Frontend (Streamlit)**
 
-- Log in to your AWS on http://lightsail.aws.amazon.com
-- Create a container service and name it `djangoapp` and pick a region you desire. 
-- Note the region of your service
-<img width="1022" alt="Schermafbeelding 2023-10-12 om 23 58 58" src="https://github.com/two-trick-pony-NL/Django_AWS_Lightsail_Template/assets/71013416/29b491f5-e837-4b93-8f2c-14b0e7e9be5b">
-<img width="1022" alt="Schermafbeelding 2023-10-12 om 23 59 38" src="https://github.com/two-trick-pony-NL/Django_AWS_Lightsail_Template/assets/71013416/3b7e85df-04ea-49d1-83c5-8ede2810d8d9">
+The Streamlit app serves as the primary interface:
+- Users upload a CSV file formatted to Photrek's requirements (no headers, N probability columns, and one outcome column).
+- The app validates the input, communicates with the Django backend, and visualizes the results.
 
+### **Backend (Django)**
+The Django backend powers the analysis workflow:
+1. **Authentication**: API keys are validated before any processing occurs.
+2. **File Ingestion**: Uploaded CSV files are read and transformed into a base64-encoded string required by Photrek's service.
+3. **Integration with Photrek**: Using the SingularityNET SDK, the backend sends the processed data to Photrek's `adr` method and retrieves the results.
+4. **Protobuf Serialization**: The response from Photrek (in Protobuf format) is deserialized into JSON for consumption by the Streamlit app.
+5. **Result Metrics**:
+   - **Accuracy**: Evaluates how well the forecast matches actual outcomes.
+   - **Decisiveness**: Assesses decision-making confidence.
+   - **Robustness**: Measures performance in low-probability scenarios.
 
+---
 
-### 2. Set Up AWS Access Credentials
+## **Key Components**
 
-Generate AWS access credentials with the necessary permissions and store them securely. You can use AWS IAM for this purpose.
-Plenty of tuturials on how to obtain this. At the end of this step you should have: 
+### **1. `streamlit/energy_forecaster.py`**
+- Handles the Streamlit frontend.
+- Allows users to:
+  - Input an API key.
+  - Upload a CSV file for analysis.
+  - View the results, including:
+    - Key metrics (Accuracy, Decisiveness, Robustness).
+    - The number of rows and columns processed.
+    - A dynamically generated chart visualizing probabilities.
 
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+### **2. `photrek/views.py`**
+- Contains the `EnergyForecastAPI` Django class-based view.
+- Key functionalities:
+  - Validates API keys using custom middleware.
+  - Ingests and processes CSV files with the `ingest_csv` function.
+  - Interacts with the SingularityNET SDK to call Photrek’s service.
+  - Returns a JSON response with metrics and visualization data.
 
-In AWS lightsail create a storage bucket and obtain the: 
-- `S3_SECRET_KEY`
-- `S3_ACCESS_KEY`
-- `S3_AWS_STORAGE_BUCKET_NAME`
+---
 
-### 3. Update GitHub Repository Secrets
+## **Folder Structure**
+```
+project/
 
-In your GitHub repository, go to `Settings` -> `Secrets` and add the following secrets:
+├── core/
+│   ├── .env                    # env file
+│   └── settings.py             # Django settings, including API key configurations
+├── photrek/
+│   ├── views.py                # Django backend logic
+│   ├── urls.py                 # API routing
+├── streamlit/
+│   ├── energy_forecaster.py    # Streamlit app frontend
+│   └── .streamlit/             # Contains config ffiles
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project documentation
+└── manage.py                   # Django project entry point
+```
 
-- `AWS_ACCESS_KEY_ID`: Your AWS access key ID. from step 2
-- `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key. from step 2
-- `AWS_REGION`: Your AWS region (e.g., `us-east-1`). this must match what you did in step 1 
-- `S3_AWS_STORAGE_BUCKET_NAME` - for file storage
-- `S3_ACCESS_KEY` 
-- `S3_SECRET_KEY`
-- `DB_USER` 
-- `DB_PASSWORD` 
-- `DB_HOST`
-- `DB_NAME`
+---
 
-- `DB_PORT` - for your SQL database. 
-You can also use sqlite in which case you should change your settings.py file in django to do so. But I chose to use a SQL database since data will otherwise be lost if the container reboots.
+## **Technologies Used**
+1. **Frontend**:
+   - [Streamlit](https://streamlit.io/): Interactive Python-based web app framework.
+2. **Backend**:
+   - [Django](https://www.djangoproject.com/): Web framework for backend logic and API development.
+   - [SingularityNET SDK](https://github.com/singnet): For integrating Photrek’s service.
+3. **Data Visualization**:
+   - [Altair](https://altair-viz.github.io/): For generating probability distribution charts.
+   - [Matplotlib](https://matplotlib.org/): For additional visualizations.
 
-When you're done it should look like this: 
+---
 
-<img width="956" alt="Schermafbeelding 2023-10-12 om 23 29 52" src="https://github.com/two-trick-pony-NL/Django_AWS_Lightsail_Template/assets/71013416/fd8cdc56-5516-4884-92db-dc9b1760b2cd">
+## **How to Set Up**
+### **Prerequisites**
+- Python 3.12 or higher
+- pip (Python package manager)
 
+### **1. Clone the Repository**
+```bash
+git clone https://github.com/aitrenches/showluv-ai
+cd showluv-ai
+```
 
+### **2. Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-### 4. Update your app
+### **3. Set Up Environment Variables**
+- Create a `.env` file in the project root:
+  ```bash
+  DJANGO_SECRET_KEY=<your_secret_key>
+  API_URL=<your_photrek_service_endpoint>
+  API_KEY=<your_photrek_api_key>
+  PRIVATE_KEY=13c6f1eb3d45cd8b...
+  INFURA_KEY=ea8b3576878979756f533f...
+  ```
 
-- Now you can update your app locally and update it to your hearts desire
-- Once you commit to main, github action will trigger
-- That looks like this:
-<img width="425" alt="Schermafbeelding 2023-10-12 om 23 30 24" src="https://github.com/two-trick-pony-NL/Django_AWS_Lightsail_Template/assets/71013416/bf41300f-bc1e-4031-9d4a-28b434a673be">
-- Once the deployment completes your lightsail dashboard should look like this:
-  <img width="953" alt="Schermafbeelding 2023-10-12 om 23 31 10" src="https://github.com/two-trick-pony-NL/Django_AWS_Lightsail_Template/assets/71013416/2153f467-e6d6-467c-ad00-21d654149a04">
-  - including the URL to your new container. You can set your own domain name from the lightsail dashboard later. 
-- you might need to add the AWS host to your `allowed_hosts` in `core/settings.py` simply paste the URL given by Lightsail e.g: djangoapp.vdotvo9a4e2a6.eu-central-1.cs.amazonlightsail.com 
+- Add the following to `secrets.toml` for Streamlit:
+  ```toml
+  API_URL = "<the_django_backend_url>"
+  API_KEY = "<the_backend_api_key>"
+  ```
+
+### **4. Run the Backend**
+Start the Django backend:
+```bash
+python manage.py runserver
+```
+
+### **5. Run the Frontend**
+Launch the Streamlit app:
+```bash
+streamlit run streamlit/energy_forecaster.py
+```
+### **6. Try out the API**
+You can try out the API using the `test_energy_forecast_api.py`
+```bash
+python test_energy_forecast_api.py
+```
+
+---
+
+## **Contributing**
+Contributions are welcome! 😊 Feel free to fork the repository, submit pull requests, or raise issues.
+
+---
