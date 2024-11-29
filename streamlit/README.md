@@ -1,4 +1,4 @@
-Here’s a detailed **README.md** for your project:
+Check out the Streamlit frontend here: https://energy-forecaster.streamlit.app
 
 ---
 
@@ -16,7 +16,7 @@ By providing probabilistic forecasts for energy consumption, this tool empowers 
    - Upload a CSV file containing probabilistic energy forecasts.
    - View visualizations of the input data and results.
    - Receive detailed metrics, including Accuracy, Decisiveness, and Robustness.
-   - Access a dynamically generated chart based on the assessment.
+   - Access a dynamically generated chart based on Photreks assessment.
 
 2. **Django Backend**:
    - Processes uploaded CSV files and prepares them for Photrek's service.
@@ -99,13 +99,13 @@ project/
 
 ## **How to Set Up**
 ### **Prerequisites**
-- Python 3.9 or higher
+- Python 3.12 or higher
 - pip (Python package manager)
 
 ### **1. Clone the Repository**
 ```bash
-git clone <repository_url>
-cd <repository_directory>
+git clone https://github.com/aitrenches/showluv-ai
+cd showluv-ai
 ```
 
 ### **2. Install Dependencies**
@@ -119,12 +119,14 @@ pip install -r requirements.txt
   DJANGO_SECRET_KEY=<your_secret_key>
   API_URL=<your_photrek_service_endpoint>
   API_KEY=<your_photrek_api_key>
+  PRIVATE_KEY=13c6f1eb3d45cd8b...
+  INFURA_KEY=ea8b3576878979756f533f...
   ```
 
 - Add the following to `secrets.toml` for Streamlit:
   ```toml
-  API_URL = "<your_django_backend_url>"
-  API_KEY = "<your_photrek_api_key>"
+  API_URL = "<the_django_backend_url>"
+  API_KEY = "<the_backend_api_key>"
   ```
 
 ### **4. Run the Backend**
@@ -137,6 +139,11 @@ python manage.py runserver
 Launch the Streamlit app:
 ```bash
 streamlit run streamlit/energy_forecaster.py
+```
+### **6. Try out the API**
+You can try out the API using the `test_energy_forecast_api.py`
+```bash
+python test_energy_forecast_api.py
 ```
 
 ---
