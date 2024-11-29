@@ -21,9 +21,10 @@ side_bar_image_path = os.path.join(os.path.dirname(__file__), "energy_image.jpeg
 
 API_URL = "https://djangoapp.vveeq17939eno.us-east-2.cs.amazonlightsail.com/snet/energy-forecast/"
 API_KEY = "EQq22/s2o9EaXKTJ8EFbKxfoTTuW"
+xAPI_URL = "http://127.0.0.1:8000/snet/energy-forecast/"
 
 headers = {
-    "X-API-KEY": API_KEY
+    "X-API-KEY": API_KEY,
 }
 
 # Streamlit App Configuration
@@ -77,6 +78,11 @@ st.sidebar.markdown("""
     Energy Forecaster
 </div>
 """, unsafe_allow_html=True)
+
+# User inputs their API key
+st.sidebar.header("Authentication")
+api_key = st.sidebar.text_input("Enter your API Key", type="password")  # Hidden input
+headers["Authorization"] = f"Api-Key {api_key}"
 
 st.sidebar.title("Navigation")
 menu = st.sidebar.radio("Select Page", ["🔍 Analyze Data", "📊 Insights & Trends"])
@@ -236,67 +242,72 @@ if menu == "🔍 Analyze Data":
                 <h2>We can further analyze the forecasts using Photrek's Risk Assessment Tool.</h2>
             </div>
             """, unsafe_allow_html=True)
+
+            st.write(f"Enter your API Key at the top of the navigation panel to access the tool")
             
             # Centralized Button
             st.markdown('<div class="center-button">', unsafe_allow_html=True)
             if st.button("Analyze Forecast"):
-                with st.spinner("Processing..."):
-                    # Send the POST request to the API with the uploaded file
-                    uploaded_file.seek(0)
-                    response = requests.post(
-                        API_URL,
-                        files={"file": uploaded_file},  # Ensure this is the file object
-                        headers=headers,
-                    )
+                if not api_key:
+                    st.error("Please enter your API key before analyzing.")
+                else:
+                    with st.spinner("Validating API Key and Analyzing Data..."):
+                        # Send the POST request to the API with the uploaded file
+                        uploaded_file.seek(0)
+                        response = requests.post(
+                            API_URL,
+                            files={"file": uploaded_file},  # Ensure this is the file object
+                            headers=headers,
+                        )
 
-                    if response.status_code == 200:
-                        st.success("Analysis Complete!")
+                        if response.status_code == 200:
+                            st.success("Analysis Complete!")
 
-                        # Parse the JSON response
-                        result = response.json()
+                            # Parse the JSON response
+                            result = response.json()
 
-                        # Extract response fields
-                        a = result.get("a", 0)  # Accuracy
-                        d = result.get("d", 0)  # Decisiveness
-                        r = result.get("r", 0)  # Robustness
-                        img = result.get("img", None)  # Base64-encoded image
-                        numr = result.get("numr", 0)  # Number of rows processed
-                        numc = result.get("numc", 0)  # Number of columns processed
+                            # Extract response fields
+                            a = result.get("a", 0)  # Accuracy
+                            d = result.get("d", 0)  # Decisiveness
+                            r = result.get("r", 0)  # Robustness
+                            img = result.get("img", None)  # Base64-encoded image
+                            numr = result.get("numr", 0)  # Number of rows processed
+                            numc = result.get("numc", 0)  # Number of columns processed
 
-                        # Display results summary
-                        st.header("Risk Aware Assessment Results")
-                        st.markdown(f"""
-                        Results computed from processing `{numr} records`, each having probabilities for `{numc - 1} categories`.
-                        """)
+                            # Display results summary
+                            st.header("Risk Aware Assessment Results")
+                            st.markdown(f"""
+                            Results computed from processing `{numr} records`, each having probabilities for `{numc - 1} categories`.
+                            """)
 
-                        # Metric descriptions
-                        st.markdown(f"""
-                        ---------------------------------
-                        **Accuracy:** **{a:.4f}**
-                        `Accuracy` metric is consistent with the log score of information theory and is computed by the geometric mean (which is the zeroth power of the generalized mean) of the probabilities.
+                            # Metric descriptions
+                            st.markdown(f"""
+                            ---------------------------------
+                            **Accuracy:** **{a:.4f}**
+                            `Accuracy` metric is consistent with the log score of information theory and is computed by the geometric mean (which is the zeroth power of the generalized mean) of the probabilities.
 
-                        
-                        **Decisiveness:** **{d:.4f}**
-                        `Decisiveness` is measured by the arithmetic mean, closely related to the classification performance of an algorithm.
+                            
+                            **Decisiveness:** **{d:.4f}**
+                            `Decisiveness` is measured by the arithmetic mean, closely related to the classification performance of an algorithm.
 
-                        
-                        **Robustness:** **{r:.4f}**
-                        The `Robustness` metric evaluates the performance of poor forecasts with low probabilities using a -2/3rds generalized-mean.
-                        """)
+                            
+                            **Robustness:** **{r:.4f}**
+                            The `Robustness` metric evaluates the performance of poor forecasts with low probabilities using a -2/3rds generalized-mean.
+                            """)
 
-                        # Display image if present
-                        if img:
-                            st.subheader("Generated Chart")
-                            decoded_img = base64.b64decode(img)  # Decode the Base64 string
-                            st.image(decoded_img, caption="Generated Image", use_container_width=True)
+                            # Display image if present
+                            if img:
+                                st.subheader("Generated Chart")
+                                decoded_img = base64.b64decode(img)  # Decode the Base64 string
+                                st.image(decoded_img, caption="Generated Image", use_container_width=True)
 
-                        # Additional Information
-                        st.subheader("Additional Information")
-                        st.write(f"Number of Rows Processed: {numr}")
-                        st.write(f"Number of Columns Processed: {numc}")
+                            # Additional Information
+                            st.subheader("Additional Information")
+                            st.write(f"Number of Rows Processed: {numr}")
+                            st.write(f"Number of Columns Processed: {numc}")
 
-                    else:
-                        st.error(f"Response Code: {response.status_code} Error: {response.content}")
+                        else:
+                            st.error(f"Response Code: {response.status_code} Error: {response.content}")
 
             st.markdown('</div>', unsafe_allow_html=True)
 

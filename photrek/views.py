@@ -7,6 +7,8 @@ from drf_yasg import openapi
 import pandas as pd
 from snet import sdk
 import base64
+from rest_framework.authentication import get_authorization_header
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 from youtube_to_twitter.authentication import APIKeyAuthentication
@@ -58,60 +60,66 @@ class EnergyForecastAPI(APIView):
     permission_classes = [IsAuthenticated]
     throttle_classes = [UserRateThrottle]
 
+    def validate_api_key(self, request):
+        # Extract the API key from the Authorization header
+        auth_header = get_authorization_header(request).decode("utf-8")
+        if not auth_header.startswith("Api-Key "):
+            raise AuthenticationFailed("Invalid API key format.")
+        
+        api_key = auth_header.split(" ")[1]
+        
+        # Validate the API key (TODO: implement database or hardcoded validation)
+        valid_api_keys = ["n3v4$gb7b47g37vrv&@"]  # Replace with your API key logic
+        if api_key not in valid_api_keys:
+            raise AuthenticationFailed("Invalid API key.")
+        
+        return True
+
     def post(self, request, *args, **kwargs):
 
-        snet_sdk = sdk.SnetSDK(config)
-
-        org_id = "Photrek" # Organization ID
-        service_id = "risk-aware-assessment" # Service ID
-        group_name = "default_group"
-        service_client = snet_sdk.create_service_client(org_id=org_id, service_id=service_id, group_name=group_name)
-
-        # Check if a file is uploaded
-        uploaded_file = request.FILES.get("file", None)
-        print(uploaded_file)
-        if not uploaded_file:
-            return Response({"error": "No file uploaded"}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            uploaded_file.seek(0)
-            input_string = ingest_csv(uploaded_file)
+            # Validate the API key
+            self.validate_api_key(request)
 
-            print('&&&&& csv &&&&&&')
-            print(input_string)
-            print('&&&&& end &&&&&&')
+            snet_sdk = sdk.SnetSDK(config)
 
-            # Call the `adr` method
-            photrek_response = service_client.call_rpc(
-                rpc_name="adr",
-                message_class="InputString",
-                s=input_string  # Pass the CSV data as a string
-            )
+            org_id = "Photrek" # Organization ID
+            service_id = "risk-aware-assessment" # Service ID
+            group_name = "default_group"
+            service_client = snet_sdk.create_service_client(org_id=org_id, service_id=service_id, group_name=group_name)
 
-            # Serialize the Protobuf response into a dictionary
-            photrek_response_dict = {
-                "a": photrek_response.a,
-                "d": photrek_response.d,
-                "r": photrek_response.r,
-                "img": photrek_response.img,  # Base64-encoded string
-                "numr": photrek_response.numr,
-                "numc": photrek_response.numc,
-            }
-            # photrek_response_dict = {
-            #     "a": 0.21586435,
-            #     "d": 0.2510465,
-            #     "r": 0.18153125,
-            #     "img": None,  # Base64-encoded string
-            #     "numr": 50,
-            #     "numc": 4,
-            # }
+            # Check if a file is uploaded
+            uploaded_file = request.FILES.get("file", None)
+            print(uploaded_file)
+            if not uploaded_file:
+                return Response({"error": "No file uploaded"}, status=status.HTTP_400_BAD_REQUEST)
 
-            print('@%@%@%@%@%@%@%@% YES ###########')
-            print(photrek_response_dict)
-            print('@%@%@%@%@%@%@%@% YES ###########')
+            try:
+                uploaded_file.seek(0)
+                input_string = ingest_csv(uploaded_file)
 
-            # Return serialized response
-            return Response(photrek_response_dict, status=status.HTTP_200_OK)
+                # Call the `adr` method
+                photrek_response = service_client.call_rpc(
+                    rpc_name="adr",
+                    message_class="InputString",
+                    s=input_string  # Pass the CSV data as a string
+                )
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                # Serialize the Protobuf response into a dictionary
+                photrek_response_dict = {
+                    "a": photrek_response.a,
+                    "d": photrek_response.d,
+                    "r": photrek_response.r,
+                    "img": photrek_response.img,  # Base64-encoded string
+                    "numr": photrek_response.numr,
+                    "numc": photrek_response.numc,
+                }
+
+                # Return serialized response
+                return Response(photrek_response_dict, status=status.HTTP_200_OK)
+
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except AuthenticationFailed as e:
+            return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
