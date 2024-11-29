@@ -7,13 +7,14 @@ import base64
 import matplotlib.pyplot as plt
 import seaborn as sns
 import environ
+import os
 
 env = environ.Env()
 environ.Env.read_env()
 
-# Path to the image
-dashboard_image_path = "energy-management-dashboard.png"
-side_bar_image_path = "energy_image.jpeg"
+# Resolve the absolute path to the image
+dashboard_image_path = os.path.join(os.path.dirname(__file__), "energy-management-dashboard.png")
+side_bar_image_path = os.path.join(os.path.dirname(__file__), "energy_image.jpeg")
 
 # API_URL = st.secrets["API_URL"]
 # API_KEY = st.secrets["API_KEY"]
