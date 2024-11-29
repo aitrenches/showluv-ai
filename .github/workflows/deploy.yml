@@ -102,6 +102,8 @@ jobs:
         - name: Installing dependancies
           run: |
             sudo pip3 install --upgrade pip
+            sudo apt-get update
+            sudo apt-get install -y build-essential python3-dev
             sudo pip3 install --ignore-installed -r requirements.txt
         - name: Collect static files
           run: |
